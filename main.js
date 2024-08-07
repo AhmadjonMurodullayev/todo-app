@@ -30,35 +30,27 @@ function displayTask() {
   task_list.innerHTML = "";
   task.forEach((item, index) => {
     let li = document.createElement("li");
-    li.innerHTML = ` <div class=" justify-between grid grid-cols-4 items-center ">
+    li.innerHTML = ` <div class=" justify-between grid grid-cols-3 items-center gap-3 ">
                     <input type="checkbox"  class="todo-checkbox " ${
                       item.disabled ? "checked" : ""
                     }/>
-                    <span class="${item.disabled ? "disabled" : ""}">${
-      item.name
-    }</span>
-    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" id="edit_btn">edit</button>
+                    <span id="todo-${index}" class="${
+      item.disabled ? "disabled" : ""
+    }" onclick="editTask(${index})">${item.name}</span >
     <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" id="delete_btn">delete</button>
                  </div>`;
     task_list.appendChild(li);
     li.querySelector(".todo-checkbox").addEventListener("change", function () {
-
       item.disabled = !item.disabled;
-      setStorage()
+      setStorage();
+      displayTask();
     });
-    li.querySelector("#edit_btn").addEventListener("click", function () {
-        let nemitem = prompt("edit", item.name)
-        if (nemitem !== "") {
-            item.name = nemitem.trim()
-        }
-        setStorage()
-        displayTask()
-      });
+
     li.querySelector("#delete_btn").addEventListener("click", function () {
-        task.splice(index,1)
-        setStorage()
-        displayTask()
-      });
+      task.splice(index, 1);
+      setStorage();
+      displayTask();
+    });
   });
   total_count.innerText = task.length;
 }
@@ -72,5 +64,22 @@ function deletTask() {
   displayTask();
 }
 function toggleTask(index) {
-  console.log(index);
+  task[index].disabled = !task[index].disabled;
+  setStorage();
+  displayTask();
+}
+function editTask(index) {
+  const todo_task = document.getElementById(`todo-${index}`);
+  let input_element = document.createElement("input");
+  todo_task.replaceWith(input_element);
+  input_element.focus();
+  input_element.value = task[index].name;
+  input_element.addEventListener("change", function () {
+    let updated_text = input_element.value;
+    if (updated_text) {
+      task[index].name = updated_text;
+      setStorage();
+    }
+    displayTask();
+  });
 }
